@@ -1,68 +1,168 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root{
+  --bg:#0b1220;
+  --card:#0f172a;
+  --card2:#111c33;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --border:rgba(255,255,255,0.08);
+  --accent:#4f46e5;
+  --accent2:#7c3aed;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background:
+    radial-gradient(1000px 600px at 20% 0%, rgba(79,70,229,0.35), transparent 60%),
+    radial-gradient(900px 600px at 80% 20%, rgba(124,58,237,0.25), transparent 55%),
+    var(--bg);
+  color:var(--text);
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+.app-shell{
+  min-height:100vh;
+  padding:40px 16px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.app-container{
+  max-width: 980px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  backdrop-filter: blur(10px);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.main-title{
+  text-align:center;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 6px 0 18px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.subtle{
+  text-align:center;
+  color:var(--muted);
+  margin: 0 0 18px;
+  font-size: 14px;
 }
+
+.navbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  margin-bottom: 18px;
+}
+
+.nav-left{
+  display:flex;
+  gap:8px;
+}
+
+.nav-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration:none;
+  color: var(--text);
+  border:1px solid transparent;
+  transition: transform .05s ease, background .15s ease, border .15s ease;
+  font-weight:600;
+  font-size: 14px;
+}
+
+.nav-link:hover{
+  background: rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+}
+
+.spacer{ flex:1; }
+
+.btn{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor:pointer;
+  font-weight:700;
+  transition: transform .05s ease, background .15s ease;
+}
+
+.btn:hover{ background: rgba(255,255,255,0.09); }
+.btn:active{ transform: translateY(1px); }
+
+.btn-danger{
+  background: rgba(239,68,68,0.12);
+  border-color: rgba(239,68,68,0.25);
+}
+
+.section{
+  margin-top: 18px;
+  padding: 16px;
+  border:1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+}
+
+.section-title{
+  margin:0 0 10px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.grid{
+  display:grid;
+  gap:10px;
+  max-width: 520px;
+}
+
+.input, .textarea{
+  width:100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  outline:none;
+}
+
+.input::placeholder, .textarea::placeholder{ color: rgba(229,231,235,0.45); }
+
+.input:focus, .textarea:focus{
+  border-color: rgba(79,70,229,0.5);
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.15);
+}
+
+.hr{
+  border:0;
+  height:1px;
+  background: var(--border);
+  margin: 18px 0;
+}
+
+.cards{
+  display:grid;
+  gap:10px;
+}
+
+.card{
+  padding: 12px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+}
+
+.muted{ color: var(--muted); }
