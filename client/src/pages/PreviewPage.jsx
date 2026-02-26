@@ -1,39 +1,47 @@
-import { useCv } from "../context/CvContext";
+import { useContext } from "react";
+import { CvContext } from "../context/CvContext.jsx";
 
 export default function PreviewPage() {
-  const { cv } = useCv();
+  const { cv } = useContext(CvContext);
 
   return (
-    <div className="section" style={{ background: "rgba(255,255,255,0.02)" }}>
-      <div style={{ borderBottom: "1px solid rgba(255,255,255,0.10)", paddingBottom: 14, marginBottom: 14 }}>
-        <div style={{ fontSize: 28, fontWeight: 900 }}>
-          {cv.fullName || "Full Name"}
-        </div>
-        <div className="muted" style={{ marginTop: 6 }}>
-          {(cv.email || "email@example.com") + "  •  " + (cv.phone || "Phone")}
-        </div>
+    <div className="card">
+      <div className="card-title">
+        <h1 className="h1">Resume Preview</h1>
+        <span className="badge">Professional layout</span>
       </div>
 
-      <h3 className="section-title">Summary</h3>
-      <div className="card" style={{ marginBottom: 14 }}>
-        {cv.summary || <span className="muted">Write a short professional summary...</span>}
-      </div>
+      <div className="cv">
+        <div className="cv-header">
+          <h2 className="cv-name">{cv.fullName || "Your Name"}</h2>
+          <p className="cv-contact">
+            {(cv.email || "email")} · {(cv.phone || "phone")}
+          </p>
+        </div>
 
-      <h3 className="section-title">Experience</h3>
-      {cv.experiences.length === 0 ? (
-        <div className="muted">No experiences yet.</div>
-      ) : (
-        <div className="cards">
-          {cv.experiences.map((e) => (
-            <div className="card" key={e.id}>
-              <div style={{ fontWeight: 900 }}>
-                {e.role || "Role"} — {e.company || "Company"}{" "}
-                {e.years ? <span className="muted">({e.years})</span> : null}
+        <div className="section-title">Summary</div>
+        <p className="p">{cv.summary || "Write a short professional summary in the editor."}</p>
+
+        <div className="section-title">Experience</div>
+        {Array.isArray(cv.experiences) && cv.experiences.length > 0 ? (
+          <div className="grid" style={{ gap: 10 }}>
+            {cv.experiences.map((exp, idx) => (
+              <div key={idx} className="card" style={{ padding: 14, background: "rgba(255,255,255,0.04)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                  <div style={{ fontWeight: 800 }}>{exp.title || "Title"}</div>
+                  <div className="small">{exp.years || exp.period || ""}</div>
+                </div>
+                <div className="small" style={{ marginTop: 4 }}>{exp.company || ""}</div>
+                <p className="p" style={{ marginTop: 8 }}>{exp.description || ""}</p>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : (
+          <p className="p" style={{ color: "var(--muted)" }}>
+            No experiences yet. Add experiences in the editor to see them here.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

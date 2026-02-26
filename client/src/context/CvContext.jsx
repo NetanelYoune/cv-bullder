@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
-const CvContext = createContext(null);
+export const CvContext = createContext();
 
-const DEFAULT_CV = {
+const defaultCv = {
   fullName: "",
   email: "",
   phone: "",
@@ -10,22 +10,14 @@ const DEFAULT_CV = {
   experiences: [],
 };
 
-const STORAGE_KEY = "cv_builder_cv";
-
 export function CvProvider({ children }) {
   const [cv, setCv] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : DEFAULT_CV;
-    } catch (e) {
-      return DEFAULT_CV;
-    }
+    const saved = localStorage.getItem("cv");
+    return saved ? JSON.parse(saved) : defaultCv;
   });
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cv));
-    } catch (e) {}
+    localStorage.setItem("cv", JSON.stringify(cv));
   }, [cv]);
 
   return (
@@ -33,12 +25,4 @@ export function CvProvider({ children }) {
       {children}
     </CvContext.Provider>
   );
-}
-
-export function useCv() {
-  const ctx = useContext(CvContext);
-  if (!ctx) {
-    throw new Error("useCv must be used inside CvProvider");
-  }
-  return ctx;
 }

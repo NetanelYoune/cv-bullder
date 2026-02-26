@@ -1,77 +1,130 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useCv } from "../context/CvContext";
+import { useContext, useMemo, useState } from "react";
+import { CvContext } from "../context/CvContext.jsx";
+import { saveCvToServer } from "../api/cvApi.js";
 
 export default function EditorPage() {
-  const { cv, setCv } = useCv();
+  const { cv, setCv } = useContext(CvContext);
+  const [saveStatus, setSaveStatus] = useState("");
 
-  const [exp, setExp] = useState({ company: "", role: "", years: "" });
+  const statusBadge = useMemo(() => {
+    if (!saveStatus) return null;
+    if (saveStatus.includes("Saved")) return <span className="badge ok">{saveStatus}</span>;
+    if (saveStatus.includes("failed")) return <span className="badge err">{saveStatus}</span>;
+    return <span className="badge">{saveStatus}</span>;
+  }, [saveStatus]);
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setCv({ ...cv, [name]: value });
-  }
+  const handleChange = (e) => {
+    setCv({ ...cv, [e.target.name]: e.target.value });
+  };
 
-  function handleExpChange(e) {
-    const { name, value } = e.target;
-    setExp({ ...exp, [name]: value });
-  }
+  const handleSaveToServer = async () => {
+    try {
+      setSaveStatus("Saving...");
+      await saveCvToServer(cv);
+      setSaveStatus("Saved ✅");
+      setTimeout(() => setSaveStatus(""), 1500);
+    } catch (err) {
+      setSaveStatus("Save failed ❌");
+    }
+  };
 
-  function addExperience() {
-    if (!exp.company || !exp.role) return;
-
-    const newExp = { id: Date.now(), ...exp };
-    setCv({ ...cv, experiences: [...cv.experiences, newExp] });
-    setExp({ company: "", role: "", years: "" });
-  }
-
-  function removeExperience(id) {
-    setCv({ ...cv, experiences: cv.experiences.filter((e) => e.id !== id) });
-  }
+  const handleReset = () => {
+    setCv({
+      fullName: "",
+      email: "",
+      phone: "",
+      summary: "",
+      experiences: [],
+    });
+  };
 
   return (
-    <div>
-      <div style={{ marginBottom: 12 }}>
-        <Link className="nav-link" to="/preview">Go to Preview</Link>
-      </div>
-
-      <div className="section">
-        <h3 className="section-title">Basic Information</h3>
-
-        <div className="grid">
-          <input className="input" name="fullName" placeholder="Full name" value={cv.fullName} onChange={handleChange} />
-          <input className="input" name="email" placeholder="Email" value={cv.email} onChange={handleChange} />
-          <input className="input" name="phone" placeholder="Phone" value={cv.phone} onChange={handleChange} />
-          <textarea className="textarea" name="summary" placeholder="Professional summary" value={cv.summary} onChange={handleChange} rows={4} />
+    <div className="grid grid-2">
+      <div className="card">
+        <div className="card-title">
+          <h1 className="h1">Resume Editor</h1>
+          {statusBadge}
         </div>
-      </div>
+        <p className="subtext">
+          Fill your details and save them to the server. The preview page will render a clean, professional CV.
+        </p>
 
-      <div className="section">
-        <h3 className="section-title">Experience</h3>
-
-        <div className="grid" style={{ marginBottom: 12 }}>
-          <input className="input" name="company" placeholder="Company" value={exp.company} onChange={handleExpChange} />
-          <input className="input" name="role" placeholder="Role" value={exp.role} onChange={handleExpChange} />
-          <input className="input" name="years" placeholder="Years (e.g. 2022-2024)" value={exp.years} onChange={handleExpChange} />
-          <button className="btn" onClick={addExperience}>Add Experience</button>
-        </div>
-
-        {cv.experiences.length === 0 ? (
-          <div className="muted">No experiences yet.</div>
-        ) : (
-          <div className="cards">
-            {cv.experiences.map((e) => (
-              <div className="card" key={e.id}>
-                <div style={{ fontWeight: 800 }}>
-                  {e.role} — {e.company} {e.years ? <span className="muted">({e.years})</span> : null}
-                </div>
-                <div style={{ marginTop: 10 }}>
-                  <button className="btn btn-danger" onClick={() => removeExperience(e.id)}>Remove</button>
-                </div>
-              </div>
-            ))}
+        <div className="form" style={{ marginTop: 16 }}>
+          <div className="field">
+            <div className="label">Full name</div>
+            <input
+              className="input"
+              name="fullName"
+              placeholder="e.g., Nati Cohen"
+              value={cv.fullName}
+              onChange={handleChange}
+            />
           </div>
-        )}
+
+          <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div className="field">
+              <div className="label">Email</div>
+              <input
+                className="input"
+                name="email"
+                placeholder="e.g., nati@mail.com"
+                value={cv.email}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="field">
+              <div className="label">Phone</div>
+              <input
+                className="input"
+                name="phone"
+                placeholder="e.g., 050-1234567"
+                value={cv.phone}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="field">
+            <div className="label">Professional summary</div>
+            <textarea
+              className="textarea"
+              name="summary"
+              placeholder="Write 3–5 lines that describe your strengths, experience, and what you're looking for."
+              value={cv.summary}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="actions">
+            <button className="btn btn-primary" type="button" onClick={handleSaveToServer}>
+              Save to Server
+            </button>
+            <button className="btn" type="button" onClick={handleReset}>
+              Reset
+            </button>
+            <span className="small">Tip: go to Preview to see the CV layout.</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">
+          <h1 className="h1" style={{ fontSize: 20 }}>Quick Preview</h1>
+          <h2 className="h2">Live from Context</h2>
+        </div>
+
+        <div className="cv">
+          <div className="cv-header">
+            <div className="cv-name">{cv.fullName || "Your Name"}</div>
+            <p className="cv-contact">
+              {(cv.email || "email")} · {(cv.phone || "phone")}
+            </p>
+          </div>
+
+          <div className="section-title">Summary</div>
+          <p className="p">{cv.summary || "Your summary will appear here…"}</p>
+        </div>
       </div>
     </div>
   );
