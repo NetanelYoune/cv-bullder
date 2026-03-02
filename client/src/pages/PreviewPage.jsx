@@ -1,44 +1,94 @@
-import { useContext } from "react";
-import { CvContext } from "../context/CvContext.jsx";
+import { useEffect, useState } from "react";
+import { getCvFromServer } from "../api/cvApi.js";
 
 export default function PreviewPage() {
-  const { cv } = useContext(CvContext);
+  const [cv, setCv] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setError("");
+        const data = await getCvFromServer(); // GET /api/cv
+        setCv(data);
+      } catch (err) {
+        // אם אין CV בשרת או שיש בעיה
+        setCv(null);
+        setError("No CV on server yet. Go to Editor and click Save CV.");
+      }
+    };
+
+    load();
+  }, []);
+
+  if (error) {
+    return (
+      <div className="card">
+        <h1 className="h1">Preview</h1>
+        <p className="p" style={{ color: "var(--muted)" }}>
+          {error}
+        </p>
+        <a className="btn" href="/editor" style={{ marginTop: 12 }}>
+          Back to Editor
+        </a>
+      </div>
+    );
+  }
+
+  if (!cv) {
+    return (
+      <div className="card">
+        <h1 className="h1">Preview</h1>
+        <p className="p" style={{ color: "var(--muted)" }}>
+          Loading CV from server...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="card">
-      <div className="card-title">
-        <h1 className="h1">Resume Preview</h1>
-        <span className="badge">Professional layout</span>
+      <div className="card-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1 className="h1">CV Preview (From Server)</h1>
+        <a className="btn" href="/editor">
+          Back to Editor
+        </a>
       </div>
 
-      <div className="cv">
+      <div className="cv" style={{ marginTop: 14 }}>
         <div className="cv-header">
-          <h2 className="cv-name">{cv.fullName || "Your Name"}</h2>
+          <div className="cv-name">{cv.fullName || "Your Name"}</div>
           <p className="cv-contact">
             {(cv.email || "email")} · {(cv.phone || "phone")}
           </p>
         </div>
 
         <div className="section-title">Summary</div>
-        <p className="p">{cv.summary || "Write a short professional summary in the editor."}</p>
+        <p className="p">{cv.summary || "No summary yet."}</p>
 
         <div className="section-title">Experience</div>
         {Array.isArray(cv.experiences) && cv.experiences.length > 0 ? (
-          <div className="grid" style={{ gap: 10 }}>
+          <div className="grid" style={{ gap: 12 }}>
             {cv.experiences.map((exp, idx) => (
-              <div key={idx} className="card" style={{ padding: 14, background: "rgba(255,255,255,0.04)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                  <div style={{ fontWeight: 800 }}>{exp.title || "Title"}</div>
-                  <div className="small">{exp.years || exp.period || ""}</div>
+              <div key={exp.id || idx} className="card" style={{ padding: 12, background: "rgba(0,0,0,0.18)" }}>
+                <div style={{ fontWeight: 800 }}>
+                  {exp.title || exp.role || "Title"}
                 </div>
-                <div className="small" style={{ marginTop: 4 }}>{exp.company || ""}</div>
-                <p className="p" style={{ marginTop: 8 }}>{exp.description || ""}</p>
+                <div className="small" style={{ marginTop: 4 }}>
+                  {(exp.company || "")}
+                  {" "}
+                  {(exp.years ? `· ${exp.years}` : "")}
+                  {(exp.startYear || exp.endYear) ? `· ${exp.startYear || ""} - ${exp.endYear || ""}` : ""}
+                </div>
+                <p className="p" style={{ marginTop: 8 }}>
+                  {exp.description || ""}
+                </p>
               </div>
             ))}
           </div>
         ) : (
           <p className="p" style={{ color: "var(--muted)" }}>
-            No experiences yet. Add experiences in the editor to see them here.
+            No experiences yet.
           </p>
         )}
       </div>
