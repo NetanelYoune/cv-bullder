@@ -1,1 +1,1 @@
-test after fix jenkins
+set react build in jenkins
