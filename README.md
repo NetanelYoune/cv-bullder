@@ -1,1 +1,1 @@
-set react build in jenkins
+test after node install
