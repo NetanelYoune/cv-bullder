@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ACTION', choices: ['build', 'test'], description: 'Choose action')
+        choice(name: 'ACTION', choices: ['build', 'test', 'deploy'], description: 'Choose action')
     }
 
     stages {
@@ -11,8 +11,18 @@ pipeline {
                 script {
                     if (params.ACTION == 'build') {
                         echo 'Running build...'
-                    } else {
+                    } 
+                    else if (params.ACTION == 'test') {
                         echo 'Running test...'
+                    } 
+                    else if (params.ACTION == 'deploy') {
+                        echo 'Running deploy...'
+
+                        publishHTML([
+                            reportDir: 'client',
+                            reportFiles: 'index.html',
+                            reportName: 'My HTML Page'
+                        ])
                     }
                 }
             }
