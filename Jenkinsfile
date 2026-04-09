@@ -36,7 +36,10 @@ pipeline {
                 echo "Running deploy..."
                 echo "User number is: ${params.USER_NUMBER}"
 
-                publishHTML([
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
                     reportDir: 'client',
                     reportFiles: 'index.html',
                     reportName: 'My HTML Page'
