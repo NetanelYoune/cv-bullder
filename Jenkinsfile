@@ -2,48 +2,20 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ACTION', choices: ['build', 'test', 'deploy'], description: 'Choose action')
-        string(name: 'USER_NUMBER', defaultValue: '0', description: 'Enter a number')
+        string(name: 'NUM1', defaultValue: '0', description: 'מספר ראשון')
+        string(name: 'NUM2', defaultValue: '0', description: 'מספר שני')
     }
 
     stages {
-
-        stage('Build') {
-            when {
-                expression { params.ACTION == 'build' }
-            }
+        stage('Calculate Sum') {
             steps {
-                echo "Running build..."
-                echo "User number is: ${params.USER_NUMBER}"
-            }
-        }
+                script {
+                    def a = params.NUM1 as Integer
+                    def b = params.NUM2 as Integer
+                    def sum = a + b
 
-        stage('Test') {
-            when {
-                expression { params.ACTION == 'test' }
-            }
-            steps {
-                echo "Running test..."
-                echo "User number is: ${params.USER_NUMBER}"
-            }
-        }
-
-        stage('Deploy HTML') {
-            when {
-                expression { params.ACTION == 'deploy' }
-            }
-            steps {
-                echo "Running deploy..."
-                echo "User number is: ${params.USER_NUMBER}"
-
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'client',
-                    reportFiles: 'index.html',
-                    reportName: 'My HTML Page'
-                ])
+                    echo "Result: ${a} + ${b} = ${sum}"
+                }
             }
         }
     }
