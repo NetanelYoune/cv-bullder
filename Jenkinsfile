@@ -3,28 +3,44 @@ pipeline {
 
     parameters {
         choice(name: 'ACTION', choices: ['build', 'test', 'deploy'], description: 'Choose action')
+        string(name: 'USER_NUMBER', defaultValue: '0', description: 'Enter a number')
     }
 
     stages {
-        stage('Run Action') {
-            steps {
-                script {
-                    if (params.ACTION == 'build') {
-                        echo 'Running build...'
-                    } 
-                    else if (params.ACTION == 'test') {
-                        echo 'Running test...'
-                    } 
-                    else if (params.ACTION == 'deploy') {
-                        echo 'Running deploy...'
 
-                        publishHTML([
-                            reportDir: 'client',
-                            reportFiles: 'index.html',
-                            reportName: 'My HTML Page'
-                        ])
-                    }
-                }
+        stage('Build') {
+            when {
+                expression { params.ACTION == 'build' }
+            }
+            steps {
+                echo "Running build..."
+                echo "User number is: ${params.USER_NUMBER}"
+            }
+        }
+
+        stage('Test') {
+            when {
+                expression { params.ACTION == 'test' }
+            }
+            steps {
+                echo "Running test..."
+                echo "User number is: ${params.USER_NUMBER}"
+            }
+        }
+
+        stage('Deploy HTML') {
+            when {
+                expression { params.ACTION == 'deploy' }
+            }
+            steps {
+                echo "Running deploy..."
+                echo "User number is: ${params.USER_NUMBER}"
+
+                publishHTML([
+                    reportDir: 'client',
+                    reportFiles: 'index.html',
+                    reportName: 'My HTML Page'
+                ])
             }
         }
     }
